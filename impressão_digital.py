@@ -59,11 +59,16 @@ class Aplication():
         self.entry_id.delete(0, END)
     def insert_tree(self, sheet):
         rows = sheet.iter_rows()
-        print(rows)
+        self.list_print.delete(*self.list_print.get_children())
         for row in rows:
             values = [cell.value for cell in row]
             self.list_print.insert('', 'end', values=values)
-        
+    def on_double_click(self, event):
+        index = event.widget.selection()[0]
+        item = event.widget.item(index)
+        data = item['values']
+        print(data)
+
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
         year = str(self.entry_data.get().split("/")[2])
@@ -223,6 +228,8 @@ class Window(Aplication):
         self.list_print.column("#7", width=60)
         self.list_print.column("#8", width=60)
         self.list_print.column("#9", width=60)
+
+        self.list_print.bind('<Double-Button-1>', self.on_double_click)
 
         self.frame2_label_copias = Label(self.frame_2, text="Copias", borderwidth=2, relief="solid")
         self.frame2_label_copias.place(relx=0.232, rely=0.001, relheight=0.1 ,relwidth=0.182)
