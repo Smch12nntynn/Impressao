@@ -3,7 +3,7 @@ from tkcalendar import DateEntry
 from tkinter import ttk
 import openpyxl
 import os 
-
+import random
 
 
 root = Tk()
@@ -38,11 +38,11 @@ class Aplication():
         self.line = last_row + 1
     
     def new_table(self, data):
-        for i in range(1, 10):
+        for i in range(1, 11):
             self.template_ws.cell(self.line, i, data[i - 1])
         self.line = self.line + 1    
     def append_table(self, data):
-        for i in range(1, 10):
+        for i in range(1, 11):
             self.ws.cell(self.line, i, data[i - 1])
         self.line = self.line + 1
     def check_table(self, filename):
@@ -68,12 +68,29 @@ class Aplication():
         item = event.widget.item(index)
         data = item['values']
         print(data)
+    def id_generator(self, tamanho):
+        caracteres = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ"
+        return "".join(random.choice(caracteres) for _ in range(tamanho))
+    def filter_column(self):
+        string = self.entry_id.get()
+        column = self.ws['A']
+        filtered_values = []
+        for cell in column:
+            row_value = cell.value
+            if string in row_value:
+                row_cells = self.ws[cell.row]  # Obtenha a linha inteira
+                row_data = [cell.value for cell in row_cells]  # Extraia os valores das células
+                filtered_values.append(row_data)
+                # filtered_values.append(self.ws[cell.row].value)
+        print(filtered_values)
 
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
         year = str(self.entry_data.get().split("/")[2])
         name = month + "20" + year + ".xlsx"
+        id = self.id_generator(4)
         data = []
+        data.append(id)
         data.append(self.entry_data.get())
         data.append(int(self.entry_copias_br.get()))
         data.append(int(self.entry_copias_r.get()))
@@ -127,7 +144,7 @@ class Window(Aplication):
 
     def buttons(self):
 
-        self.bt_buscar = Button(self.frame_1, text="Buscar")
+        self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.filter_column)
         self.bt_buscar.place(relx=0.624, rely=0.1, relheight=0.1, relwidth=0.08)
 
         self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.save_table)
@@ -200,27 +217,28 @@ class Window(Aplication):
         self.entry_pg_pix.place(relx=0.9, rely=0.55, relheight=0.1, relwidth=0.08)
 
     def output_list(self):
-        self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9"))
+        self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9","col10"))
         self.list_print.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
         
         self.list_scroll = Scrollbar(self.frame_2, orient="vertical")
         self.list_print.configure(yscroll=self.list_scroll.set)
         self.list_scroll.place(relx=0.96,rely=0.1,relheight=0.85,relwidth=0.035)
 
-        self.list_print.heading("#0", text="ID")
-        self.list_print.heading("#1", text="Data")
-        self.list_print.heading("#2", text="Brother")
-        self.list_print.heading("#3", text="Ricoh")
-        self.list_print.heading("#4", text="Brother")
-        self.list_print.heading("#5", text="Ricoh")
-        self.list_print.heading("#6", text="Brother")
-        self.list_print.heading("#7", text="Ricoh")
-        self.list_print.heading("#8", text="Pix")
-        self.list_print.heading("#9", text="Dinheiro")
+        self.list_print.heading("#0", text="")
+        self.list_print.heading("#1", text="ID")
+        self.list_print.heading("#2", text="Data")
+        self.list_print.heading("#3", text="Brother")
+        self.list_print.heading("#4", text="Ricoh")
+        self.list_print.heading("#5", text="Brother")
+        self.list_print.heading("#6", text="Ricoh")
+        self.list_print.heading("#7", text="Brother")
+        self.list_print.heading("#8", text="Ricoh")
+        self.list_print.heading("#9", text="Pix")
+        self.list_print.heading("#10", text="Dinheiro")
 
-        self.list_print.column("#0", width=30)
-        self.list_print.column("#1", width=120)
-        self.list_print.column("#2", width=60)
+        self.list_print.column("#0", width=1)
+        self.list_print.column("#1", width=50)
+        self.list_print.column("#2", width=80)
         self.list_print.column("#3", width=60)
         self.list_print.column("#4", width=60)
         self.list_print.column("#5", width=60)
@@ -228,6 +246,7 @@ class Window(Aplication):
         self.list_print.column("#7", width=60)
         self.list_print.column("#8", width=60)
         self.list_print.column("#9", width=60)
+        self.list_print.column("#10", width=60)
 
         self.list_print.bind('<Double-Button-1>', self.on_double_click)
 
