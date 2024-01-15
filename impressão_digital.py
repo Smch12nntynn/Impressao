@@ -48,6 +48,8 @@ class Aplication():
     def check_table(self, filename):
         return os.path.isfile(filename)   
     def clean_table(self):
+        self.entry_id.delete(0, END)
+        self.entry_data.delete(0, END)
         self.entry_copias_br.delete(0, END)
         self.entry_copias_r.delete(0, END)
         self.entry_perdas_br.delete(0, END)
@@ -67,22 +69,32 @@ class Aplication():
         index = event.widget.selection()[0]
         item = event.widget.item(index)
         data = item['values']
-        print(data)
+        self.clean_table()
+        self.insert_entry(data)
     def id_generator(self, tamanho):
         caracteres = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ"
         return "".join(random.choice(caracteres) for _ in range(tamanho))
     def filter_column(self):
         string = self.entry_id.get()
         column = self.ws['A']
-        filtered_values = []
         for cell in column:
             row_value = cell.value
             if string in row_value:
-                row_cells = self.ws[cell.row]  # Obtenha a linha inteira
-                row_data = [cell.value for cell in row_cells]  # Extraia os valores das células
-                filtered_values.append(row_data)
-                # filtered_values.append(self.ws[cell.row].value)
-        print(filtered_values)
+                row_cells = self.ws[cell.row]
+                row_data = [cell.value for cell in row_cells]
+        self.clean_table()
+        self.insert_entry(row_data)
+    def insert_entry(self, array):
+        self.entry_id.insert(0, array[0])
+        self.entry_data.insert(0, array[1])
+        self.entry_copias_br.insert(0, array[2])
+        self.entry_copias_r.insert(0, array[3])
+        self.entry_perdas_br.insert(0, array[4])
+        self.entry_perdas_r.insert(0, array[5])
+        self.entry_cptotal_br.insert(0, array[6])
+        self.entry_cptotal_r.insert(0, array[7])
+        # self.entry_pg_dinheiro.insert(0, array[8])
+        # self.entry_pg_pix.insert(0, array[9])
 
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
