@@ -97,6 +97,8 @@ class Aplication():
         # self.entry_pg_pix.insert(0, array[9])
 
 
+
+
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
         year = str(self.entry_data.get().split("/")[2])
@@ -166,7 +168,7 @@ class Window(Aplication):
         self.bt_apagar = Button(self.frame_1, text="Apagar")
         self.bt_apagar.place(relx=0.015, rely=0.55, relheight=0.1, relwidth=0.1)
 
-        self.bt_atualizar = Button(self.frame_1, text="Atualizar", command=self.insert_tree)
+        self.bt_atualizar = Button(self.frame_1, text="Atualizar", )
         self.bt_atualizar.place(relx=0.015, rely=0.865, relheight=0.1, relwidth=0.1)
 
         self.bt_limpar = Button(self.frame_1, text="Limpar", command=self.clean_table)
