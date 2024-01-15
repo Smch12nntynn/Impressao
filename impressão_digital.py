@@ -95,7 +95,7 @@ class Aplication():
         self.entry_cptotal_r.insert(0, array[7])
         # self.entry_pg_dinheiro.insert(0, array[8])
         # self.entry_pg_pix.insert(0, array[9])
-    print("test")
+
 
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
