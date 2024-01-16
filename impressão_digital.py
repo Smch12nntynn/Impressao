@@ -48,6 +48,7 @@ class Aplication():
     def check_table(self, filename):
         return os.path.isfile(filename)   
     def clean_table(self):
+        self.entry_id.config(state='normal')
         self.entry_id.delete(0, END)
         self.entry_data.delete(0, END)
         self.entry_copias_br.delete(0, END)
@@ -71,9 +72,9 @@ class Aplication():
         data = item['values']
         self.clean_table()
         self.insert_entry(data)
-    def id_generator(self, tamanho):
+    def id_generator(self, size):
         caracteres = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ"
-        return "".join(random.choice(caracteres) for _ in range(tamanho))
+        return "".join(random.choice(caracteres) for _ in range(size))
     def filter_column(self):
         string = self.entry_id.get()
         column = self.ws['A']
@@ -86,6 +87,7 @@ class Aplication():
         self.insert_entry(row_data)
     def insert_entry(self, array):
         self.entry_id.insert(0, array[0])
+        self.entry_id.config(state='readonly')
         self.entry_data.insert(0, array[1])
         self.entry_copias_br.insert(0, array[2])
         self.entry_copias_r.insert(0, array[3])
