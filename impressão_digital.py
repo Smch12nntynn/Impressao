@@ -10,13 +10,13 @@ root = Tk()
 
 
 class Aplication():
-    book = openpyxl.Workbook()
-    template_name = "Template.xlsx"
-    file_workbook = "Banco de Dados"
-    template_wb = openpyxl.load_workbook(template_name)
-    template_ws = template_wb[file_workbook]
-    line = 1
-    months = {
+    def __init__(self) -> None:
+        self.book = openpyxl.Workbook()
+        self.template_name = "Template.xlsx"
+        self.file_workbook = "Banco de Dados"
+        self.template_wb = openpyxl.load_workbook(self.template_name)
+        self.template_ws = self.template_wb[self.file_workbook]
+        self.months = {
         1: "Janeiro",
         2: "Fevereiro",
         3: "Março",
@@ -30,6 +30,46 @@ class Aplication():
         11: "Novembro",
         12: "Dezembro",
         }
+
+    def check_table_existence(self, filename):
+        return os.path.isfile(filename)
+    def open_worksheet(self, filename):
+        wb = openpyxl.load_workbook(filename)
+        ws = wb[self.file_workbook]
+        return ws
+        # last_row = ws.max_row
+    def fill_worksheet(self, worksheet, data) -> None:
+        last_row = worksheet.max_row + 1
+        for i in range(1, 11):
+            worksheet.cell(last_row, i, data[i - 1])
+    def name_worksheet(self):
+        month = str(self.months[int(self.entry_data.get().split("/")[0])])
+        year = str(self.entry_data.get().split("/")[2])
+        name = month + "20" + year + ".xlsx"
+        return name
+    def data_structure(self):
+        data = []
+        # id = self.id_generator(4)
+        # data.append(id)
+        data.append(self.entry_data.get())
+        data.append(int(self.entry_copias_br.get()))
+        data.append(int(self.entry_copias_r.get()))
+        data.append(int(self.entry_perdas_br.get()))
+        data.append(int(self.entry_perdas_r.get()))
+        data.append(int(self.entry_cptotal_br.get()))
+        data.append(int(self.entry_cptotal_r.get()))
+        data.append(str(float(self.entry_pg_dinheiro.get())))
+        data.append(str(float(self.entry_pg_pix.get())))
+        return
+    def get_id(self):
+        id = str(self.entry_id.get())
+        return id
+    def create_new_worksheet(self, name) -> None:
+        pass
+    
+    def add_data_to_worksheet(self) -> None:
+        pass
+
 
     def find_table(self, filename):
         self.wb = openpyxl.load_workbook(filename)
@@ -60,7 +100,7 @@ class Aplication():
         self.entry_cptotal_br.delete(0, END)
         self.entry_cptotal_r.delete(0, END)
         self.entry_id.delete(0, END)
-    def insert_tree(self, sheet):
+    def insert_tree(self, sheet) -> None:
         rows = sheet.iter_rows()
         self.list_print.delete(*self.list_print.get_children())
         for row in rows:
@@ -98,9 +138,6 @@ class Aplication():
         # self.entry_pg_dinheiro.insert(0, array[8])
         # self.entry_pg_pix.insert(0, array[9])
 
-
-
-
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
         year = str(self.entry_data.get().split("/")[2])
@@ -115,8 +152,8 @@ class Aplication():
         data.append(int(self.entry_perdas_r.get()))
         data.append(int(self.entry_cptotal_br.get()))
         data.append(int(self.entry_cptotal_r.get()))
-        data.append("R$ " + str(float(self.entry_pg_dinheiro.get())))
-        data.append("R$ " + str(float(self.entry_pg_pix.get())))
+        data.append(str(float(self.entry_pg_dinheiro.get())))
+        data.append(str(float(self.entry_pg_pix.get())))
 
         if not self.check_table(name):
             print("Cria a planilha")
@@ -132,8 +169,22 @@ class Aplication():
             self.wb.save(name) ; print("salvo")
             self.insert_tree(self.ws)
         self.clean_table()
-        
-        
+
+class Buttons(Aplication):
+    def __init__(self) -> None:
+        self.button_save()
+    def button_save(self) -> None:
+        id = self.get_id()
+        name = self.name_worksheet()
+        data = self.data_structure()
+
+        if id == '':
+            pass
+            
+        else:
+            pass
+
+
 
 
 class Window(Aplication):
