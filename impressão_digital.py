@@ -14,8 +14,8 @@ class Aplication():
         self.book = openpyxl.Workbook()
         self.template_name = "Template.xlsx"
         self.file_workbook = "Banco de Dados"
-        self.template_wb = openpyxl.load_workbook(self.template_name)
-        self.template_ws = self.template_wb[self.file_workbook]
+        # self.template_wb = openpyxl.load_workbook(self.template_name)
+        # self.template_ws = self.template_wb[self.file_workbook]
         self.months = {
         1: "Janeiro",
         2: "Fevereiro",
@@ -33,17 +33,28 @@ class Aplication():
 
     def check_table_existence(self, filename):
         return os.path.isfile(filename)
-    def open_worksheet(self, filename):
-        wb = openpyxl.load_workbook(filename)
-        ws = wb[self.file_workbook]
-        return ws
-        # last_row = ws.max_row
-    def fill_worksheet(self, worksheet, data) -> None:
-        last_row = worksheet.max_row + 1
-        for i in range(1, 11):
-            worksheet.cell(last_row, i, data[i - 1])
+    def open_workbook(self, filename):
+        workbook = openpyxl.load_workbook(filename)
+        return workbook
+    def open_worksheet(self, workbook):
+        aplication_class = Aplication()
+        worksheet = workbook[aplication_class.file_workbook]
+        return worksheet
+    def fill_worksheet(self, worksheet, data, id) -> None:
+        last_row = worksheet.max_row
+        if id == '':
+            if last_row == 1:
+                for i in range(1, 11):
+                    worksheet.cell(1, i, data[i - 1])
+            else:
+                for i in range(1, 11):
+                    worksheet.cell(last_row + 1, i, data[i - 1])
+        else:
+            for i in range(1, 11):
+                worksheet.cell(last_row + 1, i, data[i - 1])
     def name_worksheet(self):
-        month = str(self.months[int(self.entry_data.get().split("/")[0])])
+        aplication_class = Aplication()
+        month = str(aplication_class.months[int(self.entry_data.get().split("/")[0])])
         year = str(self.entry_data.get().split("/")[2])
         name = month + "20" + year + ".xlsx"
         return name
@@ -60,12 +71,10 @@ class Aplication():
         data.append(int(self.entry_cptotal_r.get()))
         data.append(str(float(self.entry_pg_dinheiro.get())))
         data.append(str(float(self.entry_pg_pix.get())))
-        return
+        return data
     def get_id(self):
         id = str(self.entry_id.get())
         return id
-    def create_new_worksheet(self, name) -> None:
-        pass
     
     def add_data_to_worksheet(self) -> None:
         pass
@@ -135,8 +144,8 @@ class Aplication():
         self.entry_perdas_r.insert(0, array[5])
         self.entry_cptotal_br.insert(0, array[6])
         self.entry_cptotal_r.insert(0, array[7])
-        # self.entry_pg_dinheiro.insert(0, array[8])
-        # self.entry_pg_pix.insert(0, array[9])
+        self.entry_pg_dinheiro.insert(0, array[8])
+        self.entry_pg_pix.insert(0, array[9])
 
     def save_table(self):
         month = str(self.months[int(self.entry_data.get().split("/")[0])])
@@ -175,19 +184,44 @@ class Buttons(Aplication):
         self.button_save()
     def button_save(self) -> None:
         id = self.get_id()
+        aplication_class = Aplication()
         name = self.name_worksheet()
         data = self.data_structure()
 
         if id == '':
-            pass
-            
+            if not self.check_table_existence(name):
+                wb = self.open_workbook(aplication_class.template_name)
+                ws = self.open_worksheet(wb)
+                new_id = self.id_generator(4)
+                data.insert(0, new_id)
+                self.fill_worksheet(ws, data, id)
+                wb.save(name)
+                self.insert_tree(ws)
+            else:
+                wb = self.open_workbook(name)
+                ws = self.open_worksheet(wb)
+                new_id = self.id_generator(4)
+                data.insert(0, new_id)
+                self.fill_worksheet(ws, data)
+                wb.save(name)
+                self.insert_tree(ws)
+            self.clean_table()
         else:
             pass
 
+            
+
+        
+        
+
+        
+    
 
 
 
-class Window(Aplication):
+
+
+class Window(Buttons):
 
     def __init__(self):
         self.create_window()
@@ -215,7 +249,7 @@ class Window(Aplication):
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.filter_column)
         self.bt_buscar.place(relx=0.624, rely=0.1, relheight=0.1, relwidth=0.08)
 
-        self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.save_table)
+        self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
         self.bt_salvar.place(relx=0.015, rely=0.4, relheight=0.1, relwidth=0.1)
 
         self.bt_apagar = Button(self.frame_1, text="Apagar")
