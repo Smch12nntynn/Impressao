@@ -1,6 +1,7 @@
 from tkinter import *
 from tkcalendar import DateEntry
 from tkinter import ttk
+from tkinter import messagebox
 import openpyxl
 import os 
 import random
@@ -102,8 +103,8 @@ class Aplication():
             if string in row_value:
                 row_cells = self.ws[cell.row]
                 row_data = [cell.value for cell in row_cells]
-        self.clean_table()
         self.insert_entry(row_data)
+        self.clean_table()
     def insert_entry(self, array):
         self.entry_id.insert(0, array[0])
         self.entry_id.config(state='readonly')
@@ -116,6 +117,13 @@ class Aplication():
         self.entry_cptotal_r.insert(0, array[7])
         self.entry_pg_dinheiro.insert(0, array[8])
         self.entry_pg_pix.insert(0, array[9])
+    def find_excel_files(self, except_file_name="Template.xlsx"):
+        path = os.getcwd()
+        files = os.listdir(path)
+        files = [file for file in files if file.endswith(".xlsx")]
+        if except_file_name in files:
+            files.remove(except_file_name)
+        return files
 
 
 class Buttons(Aplication):
@@ -162,8 +170,9 @@ class Buttons(Aplication):
         self.clean_table()
     def button_find(self) -> None:
         self.filter_column()
-
-
+    def button_open_excel(self) -> None:
+        files = self.find_excel_files()
+  
 class Window(Buttons):
 
     def __init__(self):
@@ -314,6 +323,7 @@ class Window(Buttons):
         menubar.add_cascade(label="Opções", menu=filemenu)
         menubar.add_cascade(label="Sobre", menu=filemenu2)
         filemenu.add_command(label="Sair", command=Quit)
+        filemenu.add_command(label="Abrir Planilha", command=self.button_open_excel)
         filemenu2.add_command(label="Limpar Cliente", command=self.clean_table)
 
 def main():
