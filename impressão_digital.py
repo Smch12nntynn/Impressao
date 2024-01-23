@@ -129,7 +129,8 @@ class Aplication():
 class Buttons(Aplication):
     def __init__(self) -> None:
         self.button_save()
-        self.button_find() 
+        self.button_find()
+        self.button_open_excel() 
     def button_save(self) -> None:
         id = self.get_id()
         aplication_class = Aplication()
@@ -169,9 +170,26 @@ class Buttons(Aplication):
                 print("Algum erro ou id nao econtrado")
         self.clean_table()
     def button_find(self) -> None:
-        self.filter_column()
-    def button_open_excel(self) -> None:
+        self.filter_column()   
+    def button_open_excel(self): #ainda nao finalizado 
         files = self.find_excel_files()
+        popup = Toplevel(root)
+        popup.title("Carregar planilha de excel")
+        label = Label(popup, text="Selecione o mês que deseja carregar:")
+        label.pack()
+        listbox = Listbox(popup)
+        listbox.pack()
+        for file in files:
+            listbox.insert(END, file)
+        listbox.selection_set(0)
+        def button_ok():
+            popup.wait_window()
+            opção_selecionada = listbox.get(listbox.curselection()[0])
+            print(opção_selecionada)
+            popup.destroy
+            
+        button = Button(popup, text="OK", command=button_ok)
+        button.pack()       
   
 class Window(Buttons):
 
