@@ -124,7 +124,10 @@ class Aplication():
         if except_file_name in files:
             files.remove(except_file_name)
         return files
-
+    def get_selected_option(self, popup, listbox):
+        selected_option = listbox.get(listbox.curselection()[0])
+        popup.destroy()
+        return selected_option
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -171,25 +174,9 @@ class Buttons(Aplication):
         self.clean_table()
     def button_find(self) -> None:
         self.filter_column()   
-    def button_open_excel(self): #ainda nao finalizado 
-        files = self.find_excel_files()
-        popup = Toplevel(root)
-        popup.title("Carregar planilha de excel")
-        label = Label(popup, text="Selecione o mês que deseja carregar:")
-        label.pack()
-        listbox = Listbox(popup)
-        listbox.pack()
-        for file in files:
-            listbox.insert(END, file)
-        listbox.selection_set(0)
-        def button_ok():
-            popup.wait_window()
-            opção_selecionada = listbox.get(listbox.curselection()[0])
-            print(opção_selecionada)
-            popup.destroy
-            
-        button = Button(popup, text="OK", command=button_ok)
-        button.pack()       
+    def popupbutton_open_excel(self, popup, listbox): 
+        name_workbook = self.get_selected_option(popup, listbox)
+        self.insert_tree(self.open_worksheet(self.open_workbook(name_workbook)))
   
 class Window(Buttons):
 
@@ -341,8 +328,23 @@ class Window(Buttons):
         menubar.add_cascade(label="Opções", menu=filemenu)
         menubar.add_cascade(label="Sobre", menu=filemenu2)
         filemenu.add_command(label="Sair", command=Quit)
-        filemenu.add_command(label="Abrir Planilha", command=self.button_open_excel)
+        filemenu.add_command(label="Abrir Planilha", command=self.open_excel_popup)
         filemenu2.add_command(label="Limpar Cliente", command=self.clean_table)
+
+    def open_excel_popup(self):
+        files = self.find_excel_files()
+        popup = Toplevel(root)
+        popup.title("Carregar planilha de excel")
+        label = Label(popup, text="Selecione o mês que deseja carregar:")
+        label.pack()
+        listbox = Listbox(popup)
+        listbox.pack()
+        for file in files:
+            listbox.insert(END, file)
+        listbox.selection_set(0)
+        button = Button(popup, text="OK", command=lambda: self.popupbutton_open_excel(popup, listbox))
+        button.pack()  
+        popup.wait_window()
 
 def main():
     Window()
