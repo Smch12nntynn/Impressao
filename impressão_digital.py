@@ -15,6 +15,7 @@ class Aplication():
         self.book = openpyxl.Workbook()
         self.template_name = "Template.xlsx"
         self.file_workbook = "Banco de Dados"
+        self.this_book_name = ""
         self.months = {
         1: "Janeiro",
         2: "Fevereiro",
@@ -95,16 +96,16 @@ class Aplication():
     def id_generator(self, size):
         caracteres = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ"
         return "".join(random.choice(caracteres) for _ in range(size))
-    def filter_column(self): #ainda precisa ser otimizado 
-        string = self.entry_id.get()
-        column = self.ws['A']
+    def filter_column(self, sheet, id):
+        column = sheet['A']
         for cell in column:
             row_value = cell.value
-            if string in row_value:
-                row_cells = self.ws[cell.row]
+            if id in row_value:
+                row_cells = sheet[cell.row]
                 row_data = [cell.value for cell in row_cells]
-        self.insert_entry(row_data)
+                return row_data
         self.clean_table()
+        self.insert_entry(row_data)
     def insert_entry(self, array):
         self.entry_id.insert(0, array[0])
         self.entry_id.config(state='readonly')
@@ -173,11 +174,30 @@ class Buttons(Aplication):
                 print("Algum erro ou id nao econtrado")
         self.clean_table()
     def button_find(self) -> None:
-        self.filter_column()   
+        id = self.entry_id.get()
+        wb = self.open_workbook(self.this_book_name)
+        ws = self.open_worksheet(wb)
+        if ws == "":
+            print("primeiro carregue uma planilha")
+        else:
+            row_data = self.filter_column(ws, id)
+            self.clean_table()
+            self.insert_entry(row_data) 
+    def button_delete(self):
+        id = self.entry_id.get()
+        wb = self.open_workbook(self.this_book_name)
+        ws = self.open_worksheet(wb)
+        if ws == "":
+            print("primeiro carregue uma planilha")
+        else:
+            row_data = self.filter_column(ws, id)
+            row_data.delete_row()
+            wb.save(self.this_book_name)
     def popupbutton_open_excel(self, popup, listbox): 
-        name_workbook = self.get_selected_option(popup, listbox)
-        self.insert_tree(self.open_worksheet(self.open_workbook(name_workbook)))
-  
+        book_name = self.get_selected_option(popup, listbox)
+        self.this_book_name = book_name
+        self.insert_tree(self.open_worksheet(self.open_workbook(book_name)))
+
 class Window(Buttons):
 
     def __init__(self):
@@ -204,13 +224,13 @@ class Window(Buttons):
 
     def buttons(self):
 
-        self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.filter_column)
+        self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
         self.bt_buscar.place(relx=0.624, rely=0.1, relheight=0.1, relwidth=0.08)
 
         self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
         self.bt_salvar.place(relx=0.015, rely=0.4, relheight=0.1, relwidth=0.1)
 
-        self.bt_apagar = Button(self.frame_1, text="Apagar")
+        self.bt_apagar = Button(self.frame_1, text="Apagar", command=self.button_delete)
         self.bt_apagar.place(relx=0.015, rely=0.55, relheight=0.1, relwidth=0.1)
 
         self.bt_atualizar = Button(self.frame_1, text="Atualizar", )
