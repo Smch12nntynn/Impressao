@@ -96,7 +96,7 @@ class Aplication():
     def id_generator(self, size):
         caracteres = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVXYZ"
         return "".join(random.choice(caracteres) for _ in range(size))
-    def filter_column(self, sheet, id):
+    def get_row_data_from_id(self, sheet, id):
         column = sheet['A']
         for cell in column:
             row_value = cell.value
@@ -104,8 +104,11 @@ class Aplication():
                 row_cells = sheet[cell.row]
                 row_data = [cell.value for cell in row_cells]
                 return row_data
-        self.clean_table()
-        self.insert_entry(row_data)
+    def get_row_index_from_id(self, id, sheet):
+        for row_index, row in enumerate(sheet.iter_rows()):
+            if row[0].value == id:
+                return int(row_index)
+        return -1
     def insert_entry(self, array):
         self.entry_id.insert(0, array[0])
         self.entry_id.config(state='readonly')
@@ -129,6 +132,15 @@ class Aplication():
         selected_option = listbox.get(listbox.curselection()[0])
         popup.destroy()
         return selected_option
+    def delete_row_by_id(self, name, id) -> None:
+        wb = self.open_workbook(name)
+        ws = self.open_worksheet(wb)
+        row_index = self.get_row_index_from_id(id, ws)
+        if row_index >= 0:
+            new_rows = [row for row in ws.rows if row[0].value != id]
+        print(new_rows)
+        ws.rows = new_rows
+        wb.save(name)
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -180,19 +192,17 @@ class Buttons(Aplication):
         if ws == "":
             print("primeiro carregue uma planilha")
         else:
-            row_data = self.filter_column(ws, id)
+            row_data = self.get_row_data_from_id(ws, id)
             self.clean_table()
             self.insert_entry(row_data) 
     def button_delete(self):
         id = self.entry_id.get()
-        wb = self.open_workbook(self.this_book_name)
-        ws = self.open_worksheet(wb)
-        if ws == "":
-            print("primeiro carregue uma planilha")
+        name = self.this_book_name
+        if name != "":
+            self.delete_row_by_id(name, id)
+            self.insert_tree(self.open_worksheet(self.open_workbook(name)))
         else:
-            row_data = self.filter_column(ws, id)
-            row_data.delete_row()
-            wb.save(self.this_book_name)
+            print("primeiro carregue uma planilha")
     def popupbutton_open_excel(self, popup, listbox): 
         book_name = self.get_selected_option(popup, listbox)
         self.this_book_name = book_name
