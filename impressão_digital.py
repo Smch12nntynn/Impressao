@@ -137,10 +137,13 @@ class Aplication():
         ws = self.open_worksheet(wb)
         row_index = self.get_row_index_from_id(id, ws)
         if row_index >= 0:
-            new_rows = [row for row in ws.rows if row[0].value != id]
-        print(new_rows)
-        ws.rows = new_rows
+            for cell in ws[row_index + 1]:
+                cell.value = None 
+        for row in ws.iter_rows():
+            if not all(cell.value for cell in row):
+                ws.delete_rows(row[0].row, 1)
         wb.save(name)
+        self.clean_table()
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -161,6 +164,7 @@ class Buttons(Aplication):
                 data.insert(0, new_id)
                 self.fill_worksheet(ws, data, 0)
                 wb.save(name)
+                self.this_book_name = name
                 self.insert_tree(ws)
             else:
                 wb = self.open_workbook(name)
@@ -170,6 +174,7 @@ class Buttons(Aplication):
                 data.insert(0, new_id)
                 self.fill_worksheet(ws, data, last_row)
                 wb.save(name)
+                self.this_book_name = name
                 self.insert_tree(ws)
         else:
             wb = self.open_workbook(name)
@@ -181,13 +186,16 @@ class Buttons(Aplication):
                 data.insert(0, id)
                 self.fill_worksheet(ws, data, line)
                 wb.save(name)
+                self.this_book_name = name
                 self.insert_tree(ws)
             else:
                 print("Algum erro ou id nao econtrado")
         self.clean_table()
     def button_find(self) -> None:
         id = self.entry_id.get()
-        wb = self.open_workbook(self.this_book_name)
+        name = self.this_book_name
+        print(name)
+        wb = self.open_workbook(name)
         ws = self.open_worksheet(wb)
         if ws == "":
             print("primeiro carregue uma planilha")
@@ -217,7 +225,6 @@ class Window(Buttons):
         self.output_list()
         self.buttons()
         self.menu()
-
     def create_window(self):
         root.title("Impressão Digital")
         root.geometry("788x588")
@@ -225,13 +232,11 @@ class Window(Buttons):
         root.configure(background= "#700316")
         root.grid_rowconfigure(0, weight=1)
         root.grid_columnconfigure(0, weight=1)
-
     def create_frames(self):
         self.frame_1 = Frame(root, bg="white", width="780", height="290", highlightbackground="#70032c", highlightthickness=6)
         self.frame_1.grid(column=0, row=0, sticky="n")
         self.frame_2 = Frame(root, bg="white", width="780", height="290", highlightbackground="#70032c", highlightthickness=6)
         self.frame_2.grid(column=0, row=1, sticky="s")
-
     def buttons(self):
 
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
@@ -248,7 +253,6 @@ class Window(Buttons):
 
         self.bt_limpar = Button(self.frame_1, text="Limpar", command=self.clean_table)
         self.bt_limpar.place(relx=0.885, rely=0.865, relheight=0.1, relwidth=0.1)
-
     def entry_label(self):
         self.label_data = Label(self.frame_1, text="Data")
         self.label_data.place(relx=0.135, rely=0.25, relheight=0.1, relwidth=0.1)
@@ -305,7 +309,6 @@ class Window(Buttons):
         self.entry_pg_dinheiro.place(relx=0.811, rely=0.55, relheight=0.1, relwidth=0.08)
         self.entry_pg_pix = Entry(self.frame_1)
         self.entry_pg_pix.place(relx=0.9, rely=0.55, relheight=0.1, relwidth=0.08)
-
     def output_list(self):
         self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9","col10"))
         self.list_print.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
@@ -348,7 +351,6 @@ class Window(Buttons):
         self.frame2_label_totais.place(relx=0.597, rely=0.001, relheight=0.1 ,relwidth=0.18)
         self.frame2_label_dinheiro = Label(self.frame_2, text="Dinheiro", borderwidth=2, relief="solid")
         self.frame2_label_dinheiro.place(relx=0.777, rely=0.001, relheight=0.1 ,relwidth=0.182)
-
     def menu(self): #recem criando porem ainda nao finalizado
         menubar = Menu(root)
         root.config(menu=menubar)
@@ -360,7 +362,6 @@ class Window(Buttons):
         filemenu.add_command(label="Sair", command=Quit)
         filemenu.add_command(label="Abrir Planilha", command=self.open_excel_popup)
         filemenu2.add_command(label="Limpar Cliente", command=self.clean_table)
-
     def open_excel_popup(self):
         files = self.find_excel_files()
         popup = Toplevel(root)
