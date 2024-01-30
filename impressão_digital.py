@@ -9,6 +9,14 @@ import random
 
 root = Tk()
 
+# class AplicationError():
+#     def __init__(self) -> None:
+#         pass
+#     def verify_data(self):
+#         if self.entry_data.get() == "":
+#             messagebox.showwarning("Aviso", "Por favor, insira uma data.")
+#             return False
+#         return True
 
 class Aplication():
     def __init__(self) -> None:
@@ -41,7 +49,7 @@ class Aplication():
         return worksheet
     def fill_worksheet(self, worksheet, data, posicion) -> None:
         def for_cell(line):
-            for i in range(1,11):
+            for i in range(1,10):
                 worksheet.cell(line,i,data[i-1])
         if posicion == 0:
             for_cell(1)
@@ -56,12 +64,11 @@ class Aplication():
     def data_structure(self):
         data = []
         data.append(self.entry_data.get())
+        data.append(int(self.entry_hora.get()))
         data.append(int(self.entry_copias_br.get()))
         data.append(int(self.entry_copias_r.get()))
         data.append(int(self.entry_perdas_br.get()))
         data.append(int(self.entry_perdas_r.get()))
-        data.append(int(self.entry_cptotal_br.get()))
-        data.append(int(self.entry_cptotal_r.get()))
         data.append(str(float(self.entry_pg_dinheiro.get())))
         data.append(str(float(self.entry_pg_pix.get())))
         return data
@@ -72,14 +79,13 @@ class Aplication():
         self.entry_id.config(state='normal')
         self.entry_id.delete(0, END)
         self.entry_data.delete(0, END)
+        self.entry_hora.delete(0, END)
         self.entry_copias_br.delete(0, END)
         self.entry_copias_r.delete(0, END)
         self.entry_perdas_br.delete(0, END)
         self.entry_perdas_r.delete(0, END)
         self.entry_pg_dinheiro.delete(0, END)
         self.entry_pg_pix.delete(0, END)
-        self.entry_cptotal_br.delete(0, END)
-        self.entry_cptotal_r.delete(0, END)
         self.entry_id.delete(0, END)
     def insert_tree(self, sheet) -> None:
         rows = sheet.iter_rows()
@@ -113,14 +119,13 @@ class Aplication():
         self.entry_id.insert(0, array[0])
         self.entry_id.config(state='readonly')
         self.entry_data.insert(0, array[1])
-        self.entry_copias_br.insert(0, array[2])
-        self.entry_copias_r.insert(0, array[3])
-        self.entry_perdas_br.insert(0, array[4])
-        self.entry_perdas_r.insert(0, array[5])
-        self.entry_cptotal_br.insert(0, array[6])
-        self.entry_cptotal_r.insert(0, array[7])
-        self.entry_pg_dinheiro.insert(0, array[8])
-        self.entry_pg_pix.insert(0, array[9])
+        self.entry_hora.insert(0, array[2])
+        self.entry_copias_br.insert(0, array[3])
+        self.entry_copias_r.insert(0, array[4])
+        self.entry_perdas_br.insert(0, array[5])
+        self.entry_perdas_r.insert(0, array[6])
+        self.entry_pg_dinheiro.insert(0, array[7])
+        self.entry_pg_pix.insert(0, array[8])
     def find_excel_files(self, except_file_name="Template.xlsx"):
         path = os.getcwd()
         files = os.listdir(path)
@@ -149,7 +154,6 @@ class Buttons(Aplication):
     def __init__(self) -> None:
         self.button_save()
         self.button_find()
-        self.button_open_excel() 
     def button_save(self) -> None:
         id = self.get_id()
         aplication_class = Aplication()
@@ -217,7 +221,6 @@ class Buttons(Aplication):
         self.insert_tree(self.open_worksheet(self.open_workbook(book_name)))
 
 class Window(Buttons):
-
     def __init__(self):
         self.create_window()
         self.create_frames()
@@ -240,64 +243,54 @@ class Window(Buttons):
     def buttons(self):
 
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
-        self.bt_buscar.place(relx=0.624, rely=0.1, relheight=0.1, relwidth=0.08)
+        self.bt_buscar.place(relx=0.015, rely=0.55, relheight=0.1, relwidth=0.1)
 
         self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
-        self.bt_salvar.place(relx=0.015, rely=0.4, relheight=0.1, relwidth=0.1)
+        self.bt_salvar.place(relx=0.015, rely=0.25, relheight=0.1, relwidth=0.1)
 
         self.bt_apagar = Button(self.frame_1, text="Apagar", command=self.button_delete)
-        self.bt_apagar.place(relx=0.015, rely=0.55, relheight=0.1, relwidth=0.1)
-
-        self.bt_atualizar = Button(self.frame_1, text="Atualizar", )
-        self.bt_atualizar.place(relx=0.015, rely=0.865, relheight=0.1, relwidth=0.1)
+        self.bt_apagar.place(relx=0.015, rely=0.4, relheight=0.1, relwidth=0.1)
 
         self.bt_limpar = Button(self.frame_1, text="Limpar", command=self.clean_table)
         self.bt_limpar.place(relx=0.885, rely=0.865, relheight=0.1, relwidth=0.1)
     def entry_label(self):
-        self.label_data = Label(self.frame_1, text="Data")
-        self.label_data.place(relx=0.135, rely=0.25, relheight=0.1, relwidth=0.1)
-        self.entry_data = DateEntry(self.frame_1, selectmode="day")
-        self.entry_data.place(relx=0.135, rely=0.4, relheight=0.1, relwidth=0.1)
 
         self.label_id = Label(self.frame_1, text="ID")
-        self.label_id.place(relx=0.714, rely=0.1, relheight=0.1, relwidth=0.08)
+        self.label_id.place(relx=0.135, rely=0.4, relheight=0.1, relwidth=0.08)
         self.entry_id = Entry(self.frame_1)
-        self.entry_id.place(relx=0.811, rely=0.1, relheight=0.1, relwidth=0.1)
+        self.entry_id.place(relx=0.135, rely=0.55, relheight=0.1, relwidth=0.08)
 
+        self.label_data = Label(self.frame_1, text="Data")
+        self.label_data.place(relx=0.235, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.entry_data = DateEntry(self.frame_1, selectmode="day")
+        self.entry_data.place(relx=0.235, rely=0.55, relheight=0.1, relwidth=0.08)
+
+        self.label_hora = Label(self.frame_1, text="Horas")
+        self.label_hora.place(relx=0.335, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.entry_hora = Entry(self.frame_1)
+        self.entry_hora.place(relx=0.335, rely=0.55, relheight=0.1, relwidth=0.08)
 
         self.label_copias = Label(self.frame_1, text="Cópias")
-        self.label_copias.place(relx=0.25, rely=0.25, relheight=0.1, relwidth=0.17)
+        self.label_copias.place(relx=0.437, rely=0.25, relheight=0.1, relwidth=0.17)
         self.label_copias_br = Label(self.frame_1, text="Brother")
-        self.label_copias_br.place(relx=0.25, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_copias_br.place(relx=0.437, rely=0.4, relheight=0.1, relwidth=0.08)
         self.label_copias_r = Label(self.frame_1, text="Ricoh")
-        self.label_copias_r.place(relx=0.34, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_copias_r.place(relx=0.527, rely=0.4, relheight=0.1, relwidth=0.08)
         self.entry_copias_br = Entry(self.frame_1)
-        self.entry_copias_br.place(relx=0.25, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_copias_br.place(relx=0.437, rely=0.55, relheight=0.1, relwidth=0.08)
         self.entry_copias_r = Entry(self.frame_1)
-        self.entry_copias_r.place(relx=0.34, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_copias_r.place(relx=0.527, rely=0.55, relheight=0.1, relwidth=0.08)
 
         self.label_perdas = Label(self.frame_1, text="Perdas")
-        self.label_perdas.place(relx=0.437, rely=0.25, relheight=0.1, relwidth=0.17)
+        self.label_perdas.place(relx=0.624, rely=0.25, relheight=0.1, relwidth=0.17)
         self.label_perdas_br = Label(self.frame_1, text="Brother")
-        self.label_perdas_br.place(relx=0.437, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_perdas_br.place(relx=0.624, rely=0.4, relheight=0.1, relwidth=0.08)
         self.label_perdas_r = Label(self.frame_1, text="Ricoh")
-        self.label_perdas_r.place(relx=0.527, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_perdas_r.place(relx=0.714, rely=0.4, relheight=0.1, relwidth=0.08)
         self.entry_perdas_br = Entry(self.frame_1)
-        self.entry_perdas_br.place(relx=0.437, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_perdas_br.place(relx=0.624, rely=0.55, relheight=0.1, relwidth=0.08)
         self.entry_perdas_r = Entry(self.frame_1)
-        self.entry_perdas_r.place(relx=0.527, rely=0.55, relheight=0.1, relwidth=0.08)
-
-        self.label_cptotal = Label(self.frame_1, text="Cópias totais")
-        self.label_cptotal.place(relx=0.624, rely=0.25, relheight=0.1, relwidth=0.17)
-        self.label_cptotal_br = Label(self.frame_1, text="Brother")
-        self.label_cptotal_br.place(relx=0.624, rely=0.4, relheight=0.1, relwidth=0.08)
-        self.label_cptotal_r = Label(self.frame_1, text="Ricoh")
-        self.label_cptotal_r.place(relx=0.714, rely=0.4, relheight=0.1, relwidth=0.08)
-        self.entry_cptotal_br = Entry(self.frame_1)
-        self.entry_cptotal_br.place(relx=0.624, rely=0.55, relheight=0.1, relwidth=0.08)
-        self.entry_cptotal_r = Entry(self.frame_1)
-        self.entry_cptotal_r.place(relx=0.714, rely=0.55, relheight=0.1, relwidth=0.08)
-
+        self.entry_perdas_r.place(relx=0.714, rely=0.55, relheight=0.1, relwidth=0.08)
 
         self.label_pagamento = Label(self.frame_1, text="Pagamento")
         self.label_pagamento.place(relx=0.811, rely=0.25, relheight=0.1, relwidth=0.17)
@@ -310,7 +303,7 @@ class Window(Buttons):
         self.entry_pg_pix = Entry(self.frame_1)
         self.entry_pg_pix.place(relx=0.9, rely=0.55, relheight=0.1, relwidth=0.08)
     def output_list(self):
-        self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9","col10"))
+        self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9"))
         self.list_print.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
         
         self.list_scroll = Scrollbar(self.frame_2, orient="vertical")
@@ -320,38 +313,34 @@ class Window(Buttons):
         self.list_print.heading("#0", text="")
         self.list_print.heading("#1", text="ID")
         self.list_print.heading("#2", text="Data")
-        self.list_print.heading("#3", text="Brother")
-        self.list_print.heading("#4", text="Ricoh")
-        self.list_print.heading("#5", text="Brother")
-        self.list_print.heading("#6", text="Ricoh")
-        self.list_print.heading("#7", text="Brother")
-        self.list_print.heading("#8", text="Ricoh")
-        self.list_print.heading("#9", text="Pix")
-        self.list_print.heading("#10", text="Dinheiro")
+        self.list_print.heading("#3", text="Hora")
+        self.list_print.heading("#4", text="Brother")
+        self.list_print.heading("#5", text="Ricoh")
+        self.list_print.heading("#6", text="Brother")
+        self.list_print.heading("#7", text="Ricoh")
+        self.list_print.heading("#8", text="Pix")
+        self.list_print.heading("#9", text="Dinheiro")
 
         self.list_print.column("#0", width=1)
         self.list_print.column("#1", width=50)
         self.list_print.column("#2", width=80)
-        self.list_print.column("#3", width=60)
+        self.list_print.column("#3", width=50)
         self.list_print.column("#4", width=60)
         self.list_print.column("#5", width=60)
         self.list_print.column("#6", width=60)
         self.list_print.column("#7", width=60)
         self.list_print.column("#8", width=60)
         self.list_print.column("#9", width=60)
-        self.list_print.column("#10", width=60)
 
         self.list_print.bind('<Double-Button-1>', self.on_double_click)
 
-        self.frame2_label_copias = Label(self.frame_2, text="Copias", borderwidth=2, relief="solid")
-        self.frame2_label_copias.place(relx=0.232, rely=0.001, relheight=0.1 ,relwidth=0.182)
-        self.frame2_label_perdas = Label(self.frame_2, text="Perdas", borderwidth=2, relief="solid")
-        self.frame2_label_perdas.place(relx=0.414, rely=0.001, relheight=0.1 ,relwidth=0.182)
-        self.frame2_label_totais = Label(self.frame_2, text="Totais", borderwidth=2, relief="solid")
-        self.frame2_label_totais.place(relx=0.597, rely=0.001, relheight=0.1 ,relwidth=0.18)
-        self.frame2_label_dinheiro = Label(self.frame_2, text="Dinheiro", borderwidth=2, relief="solid")
-        self.frame2_label_dinheiro.place(relx=0.777, rely=0.001, relheight=0.1 ,relwidth=0.182)
-    def menu(self): #recem criando porem ainda nao finalizado
+        self.frame2_label_perdas = Label(self.frame_2, text="Copias", borderwidth=2, relief="solid")
+        self.frame2_label_perdas.place(relx=0.344, rely=0.001, relheight=0.1 ,relwidth=0.206)
+        self.frame2_label_totais = Label(self.frame_2, text="Perdas", borderwidth=2, relief="solid")
+        self.frame2_label_totais.place(relx=0.550, rely=0.001, relheight=0.1 ,relwidth=0.201)
+        self.frame2_label_dinheiro = Label(self.frame_2, text="Pagamento", borderwidth=2, relief="solid")
+        self.frame2_label_dinheiro.place(relx=0.751, rely=0.001, relheight=0.1 ,relwidth=0.208)
+    def menu(self):
         menubar = Menu(root)
         root.config(menu=menubar)
         filemenu = Menu(menubar)
