@@ -9,15 +9,6 @@ import random
 
 root = Tk()
 
-# class AplicationError():
-#     def __init__(self) -> None:
-#         pass
-#     def verify_data(self):
-#         if self.entry_data.get() == "":
-#             messagebox.showwarning("Aviso", "Por favor, insira uma data.")
-#             return False
-#         return True
-
 class Aplication():
     def __init__(self) -> None:
         self.book = openpyxl.Workbook()
@@ -57,21 +48,27 @@ class Aplication():
             for_cell(posicion + 1)           
     def name_worksheet(self):
         aplication_class = Aplication()
-        month = str(aplication_class.months[int(self.entry_data.get().split("/")[0])])
-        year = str(self.entry_data.get().split("/")[2])
-        name = month + "20" + year + ".xlsx"
-        return name
+        try:
+            month = str(aplication_class.months[int(self.entry_data.get().split("/")[0])])
+            year = str(self.entry_data.get().split("/")[2])
+            name = month + "20" + year + ".xlsx"
+            return name
+        except ValueError:
+            messagebox.showerror("Erro", "Esqueceu de preencher a DATA.")
     def data_structure(self):
         data = []
-        data.append(self.entry_data.get())
-        data.append(int(self.entry_hora.get()))
-        data.append(int(self.entry_copias_br.get()))
-        data.append(int(self.entry_copias_r.get()))
-        data.append(int(self.entry_perdas_br.get()))
-        data.append(int(self.entry_perdas_r.get()))
-        data.append(str(float(self.entry_pg_dinheiro.get())))
-        data.append(str(float(self.entry_pg_pix.get())))
-        return data
+        try:
+            data.append(self.entry_data.get())
+            data.append(int(self.entry_hora.get()))
+            data.append(int(self.entry_copias_br.get()))
+            data.append(int(self.entry_copias_r.get()))
+            data.append(int(self.entry_perdas_br.get()))
+            data.append(int(self.entry_perdas_r.get()))
+            data.append(str(float(self.entry_pg_dinheiro.get())))
+            data.append(str(float(self.entry_pg_pix.get())))
+            return data
+        except ValueError:
+            messagebox.showerror("Erro", "Todos os campos devem ser preenchido corretamente.")
     def get_id(self):
         id = str(self.entry_id.get())
         return id
@@ -104,28 +101,34 @@ class Aplication():
         return "".join(random.choice(caracteres) for _ in range(size))
     def get_row_data_from_id(self, sheet, id):
         column = sheet['A']
-        for cell in column:
-            row_value = cell.value
-            if id in row_value:
-                row_cells = sheet[cell.row]
-                row_data = [cell.value for cell in row_cells]
-                return row_data
+        try:
+            for cell in column:
+                row_value = cell.value
+                if id in row_value:
+                    row_cells = sheet[cell.row]
+                    row_data = [cell.value for cell in row_cells]
+                    return row_data
+        except ValueError:
+            messagebox.showerror("Erro", "O ID nao foi encontrado, certifique se esta digitando corretamente.")
     def get_row_index_from_id(self, id, sheet):
         for row_index, row in enumerate(sheet.iter_rows()):
             if row[0].value == id:
                 return int(row_index)
         return -1
     def insert_entry(self, array):
-        self.entry_id.insert(0, array[0])
-        self.entry_id.config(state='readonly')
-        self.entry_data.insert(0, array[1])
-        self.entry_hora.insert(0, array[2])
-        self.entry_copias_br.insert(0, array[3])
-        self.entry_copias_r.insert(0, array[4])
-        self.entry_perdas_br.insert(0, array[5])
-        self.entry_perdas_r.insert(0, array[6])
-        self.entry_pg_dinheiro.insert(0, array[7])
-        self.entry_pg_pix.insert(0, array[8])
+        try:
+            self.entry_id.insert(0, array[0])
+            self.entry_id.config(state='readonly')
+            self.entry_data.insert(0, array[1])
+            self.entry_hora.insert(0, array[2])
+            self.entry_copias_br.insert(0, array[3])
+            self.entry_copias_r.insert(0, array[4])
+            self.entry_perdas_br.insert(0, array[5])
+            self.entry_perdas_r.insert(0, array[6])
+            self.entry_pg_dinheiro.insert(0, array[7])
+            self.entry_pg_pix.insert(0, array[8])
+        except ValueError:
+            messagebox.showerror("Erro", "O ID nao foi encontrado, certifique se esta digitando corretamente.")
     def find_excel_files(self, except_file_name="Template.xlsx"):
         path = os.getcwd()
         files = os.listdir(path)
@@ -157,8 +160,8 @@ class Buttons(Aplication):
     def button_save(self) -> None:
         id = self.get_id()
         aplication_class = Aplication()
-        name = self.name_worksheet()
         data = self.data_structure()
+        name = self.name_worksheet()
 
         if id == '':
             if not self.check_table_existence(name):
@@ -196,17 +199,16 @@ class Buttons(Aplication):
                 print("Algum erro ou id nao econtrado")
         self.clean_table()
     def button_find(self) -> None:
-        id = self.entry_id.get()
+        id = self.get_id()
         name = self.this_book_name
-        print(name)
         wb = self.open_workbook(name)
         ws = self.open_worksheet(wb)
-        if ws == "":
-            print("primeiro carregue uma planilha")
-        else:
+        try:
             row_data = self.get_row_data_from_id(ws, id)
             self.clean_table()
-            self.insert_entry(row_data) 
+            self.insert_entry(row_data)
+        except ValueError:
+            messagebox.showerror("Erro", "O ID nao foi encontrado, certifique se esta digitando corretamente.")
     def button_delete(self):
         id = self.entry_id.get()
         name = self.this_book_name
