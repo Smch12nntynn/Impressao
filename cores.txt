@@ -4,3 +4,5 @@
 #700316
 #700603
 #701c03
+
+pyinstaller.exe --hidden-import babel.numbers --onefile --noconsole --windowed impressão_digital.py

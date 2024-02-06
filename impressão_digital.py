@@ -57,18 +57,15 @@ class Aplication():
             messagebox.showerror("Erro", "Esqueceu de preencher a DATA.")
     def data_structure(self):
         data = []
-        try:
-            data.append(self.entry_data.get())
-            data.append(int(self.entry_hora.get()))
-            data.append(int(self.entry_copias_br.get()))
-            data.append(int(self.entry_copias_r.get()))
-            data.append(int(self.entry_perdas_br.get()))
-            data.append(int(self.entry_perdas_r.get()))
-            data.append(str(float(self.entry_pg_dinheiro.get())))
-            data.append(str(float(self.entry_pg_pix.get())))
-            return data
-        except ValueError:
-            messagebox.showerror("Erro", "Todos os campos devem ser preenchido corretamente.")
+        data.append(self.entry_data.get())
+        data.append(str(self.entry_hora.get()))
+        data.append(int(self.entry_copias_br.get()))
+        data.append(int(self.entry_copias_r.get()))
+        data.append(int(self.entry_perdas_br.get()))
+        data.append(int(self.entry_perdas_r.get()))
+        data.append(str(float(self.entry_pg_dinheiro.get())))
+        data.append(str(float(self.entry_pg_pix.get())))
+        return data
     def get_id(self):
         id = str(self.entry_id.get())
         return id
@@ -157,6 +154,7 @@ class Buttons(Aplication):
     def __init__(self) -> None:
         self.button_save()
         self.button_find()
+        self.button_delete()
     def button_save(self) -> None:
         id = self.get_id()
         aplication_class = Aplication()
@@ -226,84 +224,87 @@ class Window(Buttons):
     def __init__(self):
         self.create_window()
         self.create_frames()
+        self.label_frame()
         self.entry_label()
         self.output_list()
         self.buttons()
         self.menu()
     def create_window(self):
         root.title("Impressão Digital")
-        root.geometry("788x588")
+        root.geometry("900x700")
         root.resizable(False, False)
         root.configure(background= "#700316")
         root.grid_rowconfigure(0, weight=1)
         root.grid_columnconfigure(0, weight=1)
     def create_frames(self):
-        self.frame_1 = Frame(root, bg="white", width="780", height="290", highlightbackground="#70032c", highlightthickness=6)
+        self.frame_1 = Frame(root, bg="white", width="880", height="350", highlightbackground="#70032c", highlightthickness=6)
         self.frame_1.grid(column=0, row=0, sticky="n")
-        self.frame_2 = Frame(root, bg="white", width="780", height="290", highlightbackground="#70032c", highlightthickness=6)
+        self.frame_2 = Frame(root, bg="white", width="880", height="340", highlightbackground="#70032c", highlightthickness=6)
         self.frame_2.grid(column=0, row=1, sticky="s")
+    def label_frame(self):
+        self.lf_filter = LabelFrame(self.frame_1, text="Pesquisar", borderwidth=1, relief="solid")
+        self.lf_filter.place(x=15, y=40, width=390, height=50)
+        self.lf_dados = LabelFrame(self.frame_1, text="Inserir Dados", borderwidth=1, relief="solid")
+        self.lf_dados.place(x=15, y=100, width=500, height=220)
+        self.lf_pagamentos = LabelFrame(self.lf_dados, text="Pagamentos", borderwidth=1, relief="solid")
+        self.lf_pagamentos.place(x=300, y=40, width=185, height=120)
+        self.lf_pagamentos = LabelFrame(self.lf_dados, text="Impressão", borderwidth=1, relief="solid")
+        self.lf_pagamentos.place(x=15, y=40, width=250, height=120)      
     def buttons(self):
 
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
-        self.bt_buscar.place(relx=0.015, rely=0.55, relheight=0.1, relwidth=0.1)
-
-        self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
-        self.bt_salvar.place(relx=0.015, rely=0.25, relheight=0.1, relwidth=0.1)
+        self.bt_buscar.place(relx=0.24, rely=0.15, relheight=0.1, relwidth=0.1)
 
         self.bt_apagar = Button(self.frame_1, text="Apagar", command=self.button_delete)
-        self.bt_apagar.place(relx=0.015, rely=0.4, relheight=0.1, relwidth=0.1)
+        self.bt_apagar.place(relx=0.35, rely=0.15, relheight=0.1, relwidth=0.1)
+
+        self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
+        self.bt_salvar.place(relx=0.036, rely=0.83, relheight=0.1, relwidth=0.1)
 
         self.bt_limpar = Button(self.frame_1, text="Limpar", command=self.clean_table)
-        self.bt_limpar.place(relx=0.885, rely=0.865, relheight=0.1, relwidth=0.1)
+        self.bt_limpar.place(relx=0.48, rely=0.83, relheight=0.1, relwidth=0.1)
     def entry_label(self):
 
         self.label_id = Label(self.frame_1, text="ID")
-        self.label_id.place(relx=0.135, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_id.place(relx=0.03, rely=0.18, relheight=0.05, relwidth=0.05)
         self.entry_id = Entry(self.frame_1)
-        self.entry_id.place(relx=0.135, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_id.place(relx=0.11, rely=0.15, relheight=0.1, relwidth=0.08)
 
         self.label_data = Label(self.frame_1, text="Data")
-        self.label_data.place(relx=0.235, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_data.place(relx=0.04, rely=0.38, relheight=0.05, relwidth=0.05)
         self.entry_data = DateEntry(self.frame_1, selectmode="day")
-        self.entry_data.place(relx=0.235, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_data.place(relx=0.11, rely=0.35, relheight=0.1, relwidth=0.08)
 
-        self.label_hora = Label(self.frame_1, text="Horas")
-        self.label_hora.place(relx=0.335, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_hora = Label(self.frame_1, text="Hora")
+        self.label_hora.place(relx=0.22, rely=0.38, relheight=0.05, relwidth=0.05)
         self.entry_hora = Entry(self.frame_1)
-        self.entry_hora.place(relx=0.335, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_hora.place(relx=0.3, rely=0.35, relheight=0.1, relwidth=0.08)
 
         self.label_copias = Label(self.frame_1, text="Cópias")
-        self.label_copias.place(relx=0.437, rely=0.25, relheight=0.1, relwidth=0.17)
-        self.label_copias_br = Label(self.frame_1, text="Brother")
-        self.label_copias_br.place(relx=0.437, rely=0.4, relheight=0.1, relwidth=0.08)
-        self.label_copias_r = Label(self.frame_1, text="Ricoh")
-        self.label_copias_r.place(relx=0.527, rely=0.4, relheight=0.1, relwidth=0.08)
-        self.entry_copias_br = Entry(self.frame_1)
-        self.entry_copias_br.place(relx=0.437, rely=0.55, relheight=0.1, relwidth=0.08)
-        self.entry_copias_r = Entry(self.frame_1)
-        self.entry_copias_r.place(relx=0.527, rely=0.55, relheight=0.1, relwidth=0.08)
-
+        self.label_copias.place(relx=0.05, rely=0.58, relheight=0.05, relwidth=0.05)
         self.label_perdas = Label(self.frame_1, text="Perdas")
-        self.label_perdas.place(relx=0.624, rely=0.25, relheight=0.1, relwidth=0.17)
-        self.label_perdas_br = Label(self.frame_1, text="Brother")
-        self.label_perdas_br.place(relx=0.624, rely=0.4, relheight=0.1, relwidth=0.08)
-        self.label_perdas_r = Label(self.frame_1, text="Ricoh")
-        self.label_perdas_r.place(relx=0.714, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_perdas.place(relx=0.05, rely=0.68, relheight=0.05, relwidth=0.05) 
+        self.label_copias_br = Label(self.frame_1, text="Brother")
+        self.label_copias_br.place(relx=0.12, rely=0.5, relheight=0.05, relwidth=0.05)
+        self.label_copias_r = Label(self.frame_1, text="Ricoh")
+        self.label_copias_r.place(relx=0.215, rely=0.5, relheight=0.05, relwidth=0.05) 
+        self.entry_copias_br = Entry(self.frame_1)
+        self.entry_copias_br.place(relx=0.12, rely=0.56, relheight=0.1, relwidth=0.08)
+        self.entry_copias_r = Entry(self.frame_1)
+        self.entry_copias_r.place(relx=0.22, rely=0.56, relheight=0.1, relwidth=0.08)
         self.entry_perdas_br = Entry(self.frame_1)
-        self.entry_perdas_br.place(relx=0.624, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_perdas_br.place(relx=0.12, rely=0.66, relheight=0.1, relwidth=0.08)
         self.entry_perdas_r = Entry(self.frame_1)
-        self.entry_perdas_r.place(relx=0.714, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_perdas_r.place(relx=0.22, rely=0.66, relheight=0.1, relwidth=0.08)
 
-        self.label_pagamento = Label(self.frame_1, text="Pagamento")
-        self.label_pagamento.place(relx=0.811, rely=0.25, relheight=0.1, relwidth=0.17)
         self.label_pg_dinheiro = Label(self.frame_1, text="Dinheiro")
-        self.label_pg_dinheiro.place(relx=0.811, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_pg_dinheiro.place(relx=0.38, rely=0.58, relheight=0.05, relwidth=0.06)
         self.label_pg_pix = Label(self.frame_1, text="Pix")
-        self.label_pg_pix.place(relx=0.9, rely=0.4, relheight=0.1, relwidth=0.08)
+        self.label_pg_pix.place(relx=0.38, rely=0.68, relheight=0.05, relwidth=0.06)
         self.entry_pg_dinheiro = Entry(self.frame_1)
-        self.entry_pg_dinheiro.place(relx=0.811, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_pg_dinheiro.place(relx=0.46, rely=0.56, relheight=0.1, relwidth=0.08)
         self.entry_pg_pix = Entry(self.frame_1)
-        self.entry_pg_pix.place(relx=0.9, rely=0.55, relheight=0.1, relwidth=0.08)
+        self.entry_pg_pix.place(relx=0.46, rely=0.66, relheight=0.1, relwidth=0.08)
     def output_list(self):
         self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9"))
         self.list_print.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
@@ -370,7 +371,7 @@ class Window(Buttons):
 
 def main():
     Window()
-
+    Aplication()
     root.mainloop()
 
 if __name__ == "__main__":
