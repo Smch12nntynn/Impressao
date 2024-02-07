@@ -229,6 +229,7 @@ class Window(Buttons):
         self.output_list()
         self.buttons()
         self.menu()
+        self.image_generetor()
     def create_window(self):
         root.title("Impressão Digital")
         root.geometry("900x700")
@@ -249,7 +250,7 @@ class Window(Buttons):
         self.lf_pagamentos = LabelFrame(self.lf_dados, text="Pagamentos", borderwidth=1, relief="solid")
         self.lf_pagamentos.place(x=300, y=40, width=185, height=120)
         self.lf_pagamentos = LabelFrame(self.lf_dados, text="Impressão", borderwidth=1, relief="solid")
-        self.lf_pagamentos.place(x=15, y=40, width=250, height=120)      
+        self.lf_pagamentos.place(x=15, y=40, width=250, height=120)     
     def buttons(self):
 
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
@@ -321,8 +322,8 @@ class Window(Buttons):
         self.list_print.heading("#5", text="Ricoh")
         self.list_print.heading("#6", text="Brother")
         self.list_print.heading("#7", text="Ricoh")
-        self.list_print.heading("#8", text="Pix")
-        self.list_print.heading("#9", text="Dinheiro")
+        self.list_print.heading("#8", text="Dinheiro")
+        self.list_print.heading("#9", text="Pix")
 
         self.list_print.column("#0", width=1)
         self.list_print.column("#1", width=50)
@@ -368,6 +369,19 @@ class Window(Buttons):
         button = Button(popup, text="OK", command=lambda: self.popupbutton_open_excel(popup, listbox))
         button.pack()  
         popup.wait_window()
+    def image_generetor(self):
+        pastaApp = os.path.dirname(__file__)
+        caminho_imagem = os.path.join(pastaApp, "img.png")
+        img = PhotoImage(file=caminho_imagem)
+        label = Label(self.frame_1, image=img)
+        label.place(x=600, y=100, width=200, height=200)
+        try:
+            img = PhotoImage(file=caminho_imagem)
+        except TclError as e:
+            print(f"Erro ao carregar a imagem: {e}")
+            return
+        label = Label(self.frame_1, image=img)
+        label.place(x=600, y=100, width=200, height=200)
 
 def main():
     Window()
