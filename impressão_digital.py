@@ -3,8 +3,10 @@ from tkcalendar import DateEntry
 from tkinter import ttk
 from tkinter import messagebox
 import openpyxl
+from openpyxl.styles import Alignment
 import os 
 import random
+
 
 
 root = Tk()
@@ -39,9 +41,11 @@ class Aplication():
         worksheet = workbook[aplication_class.file_workbook]
         return worksheet
     def fill_worksheet(self, worksheet, data, posicion) -> None:
+        alignment = Alignment(horizontal="center", vertical="center")
         def for_cell(line):
             for i in range(1,10):
-                worksheet.cell(line,i,data[i-1])
+                cell = worksheet.cell(line,i,data[i-1])
+                cell.alignment = alignment
         if posicion == 0:
             for_cell(1)
         else:
@@ -84,6 +88,7 @@ class Aplication():
     def insert_tree(self, sheet) -> None:
         rows = sheet.iter_rows()
         self.list_print.delete(*self.list_print.get_children())
+        next(rows)
         for row in rows:
             values = [cell.value for cell in row]
             self.list_print.insert('', 'end', values=values)
@@ -167,7 +172,7 @@ class Buttons(Aplication):
                 ws = self.open_worksheet(wb)
                 new_id = self.id_generator(4)
                 data.insert(0, new_id)
-                self.fill_worksheet(ws, data, 0)
+                self.fill_worksheet(ws, data, 1)
                 wb.save(name)
                 self.this_book_name = name
                 self.insert_tree(ws)
@@ -229,7 +234,6 @@ class Window(Buttons):
         self.output_list()
         self.buttons()
         self.menu()
-        self.image_generetor()
     def create_window(self):
         root.title("Impressão Digital")
         root.geometry("900x700")
@@ -369,19 +373,6 @@ class Window(Buttons):
         button = Button(popup, text="OK", command=lambda: self.popupbutton_open_excel(popup, listbox))
         button.pack()  
         popup.wait_window()
-    def image_generetor(self):
-        pastaApp = os.path.dirname(__file__)
-        caminho_imagem = os.path.join(pastaApp, "img.png")
-        img = PhotoImage(file=caminho_imagem)
-        label = Label(self.frame_1, image=img)
-        label.place(x=600, y=100, width=200, height=200)
-        try:
-            img = PhotoImage(file=caminho_imagem)
-        except TclError as e:
-            print(f"Erro ao carregar a imagem: {e}")
-            return
-        label = Label(self.frame_1, image=img)
-        label.place(x=600, y=100, width=200, height=200)
 
 def main():
     Window()
