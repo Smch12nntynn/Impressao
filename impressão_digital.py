@@ -42,10 +42,13 @@ class Aplication():
         return worksheet
     def fill_worksheet(self, worksheet, data, posicion) -> None:
         alignment = Alignment(horizontal="center", vertical="center")
+
         def for_cell(line):
             for i in range(1,10):
                 cell = worksheet.cell(line,i,data[i-1])
                 cell.alignment = alignment
+                if i > 7:
+                    cell.number_format = "R$ #.##0,0"
         if posicion == 0:
             for_cell(1)
         else:
@@ -67,8 +70,8 @@ class Aplication():
         data.append(int(self.entry_copias_r.get()))
         data.append(int(self.entry_perdas_br.get()))
         data.append(int(self.entry_perdas_r.get()))
-        data.append(str(float(self.entry_pg_dinheiro.get())))
-        data.append(str(float(self.entry_pg_pix.get())))
+        data.append(float(self.entry_pg_dinheiro.get()))
+        data.append(float(self.entry_pg_pix.get()))
         return data
     def get_id(self):
         id = str(self.entry_id.get())
@@ -224,6 +227,8 @@ class Buttons(Aplication):
         book_name = self.get_selected_option(popup, listbox)
         self.this_book_name = book_name
         self.insert_tree(self.open_worksheet(self.open_workbook(book_name)))
+    def monthly_report(self) -> None:
+        pass
 
 class Window(Buttons):
     def __init__(self):
@@ -356,8 +361,9 @@ class Window(Buttons):
         def Quit(): root.destroy()
         menubar.add_cascade(label="Opções", menu=filemenu)
         menubar.add_cascade(label="Sobre", menu=filemenu2)
-        filemenu.add_command(label="Sair", command=Quit)
         filemenu.add_command(label="Abrir Planilha", command=self.open_excel_popup)
+        filemenu.add_command(label="Fazer Relatorio", command=self.monthly_report)
+        filemenu.add_command(label="Sair", command=Quit)
         filemenu2.add_command(label="Limpar Cliente", command=self.clean_table)
     def open_excel_popup(self):
         files = self.find_excel_files()
