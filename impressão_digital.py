@@ -8,14 +8,14 @@ import os
 import random
 
 
-
 root = Tk()
 
 class Aplication():
     def __init__(self) -> None:
         self.book = openpyxl.Workbook()
         self.template_name = "Template.xlsx"
-        self.file_workbook = "Banco de Dados"
+        self.file_BD_workbook = "Banco de Dados"
+        self.file_monthly_workbook = "Mensal"
         self.this_book_name = ""
         self.months = {
         1: "Janeiro",
@@ -36,9 +36,13 @@ class Aplication():
     def open_workbook(self, filename):
         workbook = openpyxl.load_workbook(filename)
         return workbook
-    def open_worksheet(self, workbook):
+    def open_BD_worksheet(self, workbook):
         aplication_class = Aplication()
-        worksheet = workbook[aplication_class.file_workbook]
+        worksheet = workbook[aplication_class.file_BD_workbook]
+        return worksheet
+    def open_monthly_worksheet(self, workbook):
+        aplication_class = Aplication()
+        worksheet = workbook[aplication_class.file_monthly_workbook]
         return worksheet
     def fill_worksheet(self, worksheet, data, posicion) -> None:
         alignment = Alignment(horizontal="center", vertical="center")
@@ -147,7 +151,7 @@ class Aplication():
         return selected_option
     def delete_row_by_id(self, name, id) -> None:
         wb = self.open_workbook(name)
-        ws = self.open_worksheet(wb)
+        ws = self.open_BD_worksheet(wb)
         row_index = self.get_row_index_from_id(id, ws)
         if row_index >= 0:
             for cell in ws[row_index + 1]:
@@ -157,6 +161,43 @@ class Aplication():
                 ws.delete_rows(row[0].row, 1)
         wb.save(name)
         self.clean_table()
+    def make_monthly_data(self, bd_ws):
+        coluna_data = 2
+        coluna_copias_br = 4
+        coluna_copias_ri = 5
+        coluna_perdas_br = 6
+        coluna_perdas_ri = 7
+        coluna_dinheiro = 8
+        coluna_pix = 9
+
+        dados_dia = {}
+        for row in range(2, bd_ws.max_row + 1):
+            data_celula = bd_ws.cell(row=row, column=coluna_data).value
+            copias_br = bd_ws.cell(row=row, column=coluna_copias_br).value
+            copias_ri = bd_ws.cell(row=row, column=coluna_copias_ri).value
+            perdas_br = bd_ws.cell(row=row, column=coluna_perdas_br).value
+            perdas_ri = bd_ws.cell(row=row, column=coluna_perdas_ri).value
+            dinheiro = bd_ws.cell(row=row, column=coluna_dinheiro).value
+            pix = bd_ws.cell(row=row, column=coluna_pix).value
+            data_objeto = data_celula.split("/")
+            dia = data_objeto[1]
+            if dia not in dados_dia:
+                dados_dia[dia] = {
+                    "copias_br": 0,
+                    "copias_ri": 0,
+                    "perdas_br": 0,
+                    "perdas_ri": 0,
+                    "dinheiro": 0,
+                    "pix": 0,
+                    }
+            dados_dia[dia]["copias_br"] += copias_br
+            dados_dia[dia]["copias_ri"] += copias_ri
+            dados_dia[dia]["perdas_br"] += perdas_br
+            dados_dia[dia]["perdas_ri"] += perdas_ri
+            dados_dia[dia]["dinheiro"] += dinheiro
+            dados_dia[dia]["pix"] += pix
+        return dados_dia
+        
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -172,7 +213,7 @@ class Buttons(Aplication):
         if id == '':
             if not self.check_table_existence(name):
                 wb = self.open_workbook(aplication_class.template_name)
-                ws = self.open_worksheet(wb)
+                ws = self.open_BD_worksheet(wb)
                 new_id = self.id_generator(4)
                 data.insert(0, new_id)
                 self.fill_worksheet(ws, data, 1)
@@ -181,7 +222,7 @@ class Buttons(Aplication):
                 self.insert_tree(ws)
             else:
                 wb = self.open_workbook(name)
-                ws = self.open_worksheet(wb)
+                ws = self.open_BD_worksheet(wb)
                 last_row = ws.max_row
                 new_id = self.id_generator(4)
                 data.insert(0, new_id)
@@ -191,7 +232,7 @@ class Buttons(Aplication):
                 self.insert_tree(ws)
         else:
             wb = self.open_workbook(name)
-            ws = self.open_worksheet(wb)
+            ws = self.open_BD_worksheet(wb)
             column_values = [cell.value for cell in ws['A']]
             posicion = column_values.index(id)
             if posicion != -1:
@@ -208,27 +249,35 @@ class Buttons(Aplication):
         id = self.get_id()
         name = self.this_book_name
         wb = self.open_workbook(name)
-        ws = self.open_worksheet(wb)
+        ws = self.open_BD_worksheet(wb)
         try:
             row_data = self.get_row_data_from_id(ws, id)
             self.clean_table()
             self.insert_entry(row_data)
         except ValueError:
-            messagebox.showerror("Erro", "O ID nao foi encontrado, certifique se esta digitando corretamente.")
+            return messagebox.showerror("Erro", "O ID nao foi encontrado, certifique se esta digitando corretamente.")
     def button_delete(self):
         id = self.entry_id.get()
         name = self.this_book_name
         if name != "":
             self.delete_row_by_id(name, id)
-            self.insert_tree(self.open_worksheet(self.open_workbook(name)))
+            self.insert_tree(self.open_BD_worksheet(self.open_workbook(name)))
         else:
             print("primeiro carregue uma planilha")
     def popupbutton_open_excel(self, popup, listbox): 
         book_name = self.get_selected_option(popup, listbox)
         self.this_book_name = book_name
-        self.insert_tree(self.open_worksheet(self.open_workbook(book_name)))
+        self.insert_tree(self.open_BD_worksheet(self.open_workbook(book_name)))
     def monthly_report(self) -> None:
-        pass
+        try:
+            name = self.this_book_name
+        except AttributeError:
+            return messagebox.showerror("Erro", "Por favor abra uma planilha primeiro")
+        wb = self.open_workbook(name)
+        bd_ws = self.open_BD_worksheet(wb)
+        monthly_ws = self.open_monthly_worksheet(wb)
+        dados = self.make_monthly_data(bd_ws)
+        print(dados)
 
 class Window(Buttons):
     def __init__(self):
