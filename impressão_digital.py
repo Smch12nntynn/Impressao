@@ -197,7 +197,8 @@ class Aplication():
             dados_dia[dia]["dinheiro"] += dinheiro
             dados_dia[dia]["pix"] += pix
         return dados_dia
-        
+    def insert_monthly_data(self, m_ws):
+        pass
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -275,9 +276,19 @@ class Buttons(Aplication):
             return messagebox.showerror("Erro", "Por favor abra uma planilha primeiro")
         wb = self.open_workbook(name)
         bd_ws = self.open_BD_worksheet(wb)
-        monthly_ws = self.open_monthly_worksheet(wb)
+        m_ws = self.open_monthly_worksheet(wb)
         dados = self.make_monthly_data(bd_ws)
+        line = 4
+        column = 2
+        dia = '23'
+        print(m_ws.max_row)
+        m_ws.cell(line, column, dados[dia]['copias_br'])
+        print(m_ws.cell(line,1).value)
+        wb.save(name)
         print(dados)
+        print(dados[dia]['copias_br'])
+        print(dados[dia]['perdas_br'])
+        print(dados[dia]['copias_br'] + dados[dia]['perdas_br'])
 
 class Window(Buttons):
     def __init__(self):
