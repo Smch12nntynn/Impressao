@@ -305,9 +305,6 @@ class Buttons(Aplication):
             dados = self.make_monthly_data(bd_ws)
             self.insert_monthly_data(m_ws, dados)
             wb.save(name)
-            print("sim")
-        else:
-            print("nao")
 
 class Window(Buttons):
     def __init__(self):
