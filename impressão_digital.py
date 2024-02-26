@@ -197,8 +197,31 @@ class Aplication():
             dados_dia[dia]["dinheiro"] += dinheiro
             dados_dia[dia]["pix"] += pix
         return dados_dia
-    def insert_monthly_data(self, m_ws):
-        pass
+    def insert_monthly_data(self, m_ws, data):
+        worksheet = m_ws
+        alignment = Alignment(horizontal="center", vertical="center")
+        for i in range(1, 32):
+            line = i + 2
+            day = str(worksheet.cell(line, 1).value)
+            if day in data:
+                worksheet.cell(line, 2, data[day]['copias_br'])
+                worksheet.cell(line, 2, data[day]['copias_br']).alignment = alignment
+                worksheet.cell(line, 3, data[day]['copias_ri'])
+                worksheet.cell(line, 3, data[day]['copias_ri']).alignment = alignment
+                worksheet.cell(line, 4, data[day]['perdas_br'])
+                worksheet.cell(line, 4, data[day]['perdas_br']).alignment = alignment
+                worksheet.cell(line, 5, data[day]['perdas_ri'])
+                worksheet.cell(line, 5, data[day]['perdas_ri']).alignment = alignment
+                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br'])
+                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br']).alignment = alignment
+                worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri'])
+                worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
+                worksheet.cell(line, 8, data[day]['dinheiro'])
+                worksheet.cell(line, 8, data[day]['dinheiro']).number_format = "R$ #.##0,0"
+                worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
+                worksheet.cell(line, 9, data[day]['pix'])
+                worksheet.cell(line, 9, data[day]['pix']).number_format = "R$ #.##0,0"
+                worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -274,21 +297,17 @@ class Buttons(Aplication):
             name = self.this_book_name
         except AttributeError:
             return messagebox.showerror("Erro", "Por favor abra uma planilha primeiro")
-        wb = self.open_workbook(name)
-        bd_ws = self.open_BD_worksheet(wb)
-        m_ws = self.open_monthly_worksheet(wb)
-        dados = self.make_monthly_data(bd_ws)
-        line = 4
-        column = 2
-        dia = '23'
-        print(m_ws.max_row)
-        m_ws.cell(line, column, dados[dia]['copias_br'])
-        print(m_ws.cell(line,1).value)
-        wb.save(name)
-        print(dados)
-        print(dados[dia]['copias_br'])
-        print(dados[dia]['perdas_br'])
-        print(dados[dia]['copias_br'] + dados[dia]['perdas_br'])
+        quest = messagebox.askyesno("Relatorio", "Deseja realmente fazer o relatorio ?")
+        if quest is True:   
+            wb = self.open_workbook(name)
+            bd_ws = self.open_BD_worksheet(wb)
+            m_ws = self.open_monthly_worksheet(wb)
+            dados = self.make_monthly_data(bd_ws)
+            self.insert_monthly_data(m_ws, dados)
+            wb.save(name)
+            print("sim")
+        else:
+            print("nao")
 
 class Window(Buttons):
     def __init__(self):
@@ -325,7 +344,7 @@ class Window(Buttons):
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
         self.bt_buscar.place(relx=0.24, rely=0.15, relheight=0.1, relwidth=0.1)
 
-        self.bt_apagar = Button(self.frame_1, text="Apagar", command=self.button_delete)
+        self.bt_apagar = Button(self.frame_1, text="Apagar", )
         self.bt_apagar.place(relx=0.35, rely=0.15, relheight=0.1, relwidth=0.1)
 
         self.bt_salvar = Button(self.frame_1, text="Salvar", command=self.button_save)
