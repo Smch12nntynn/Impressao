@@ -52,7 +52,8 @@ class Aplication():
                 cell = worksheet.cell(line,i,data[i-1])
                 cell.alignment = alignment
                 if i > 7:
-                    cell.number_format = "R$ #.##0,0"
+                    cell.number_format = 'R$ 0.00'
+
         if posicion == 0:
             for_cell(1)
         else:
@@ -96,6 +97,7 @@ class Aplication():
         rows = sheet.iter_rows()
         self.list_print.delete(*self.list_print.get_children())
         next(rows)
+        rows = list(rows)[::-1]
         for row in rows:
             values = [cell.value for cell in row]
             self.list_print.insert('', 'end', values=values)
@@ -217,10 +219,8 @@ class Aplication():
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri'])
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
                 worksheet.cell(line, 8, data[day]['dinheiro'])
-                worksheet.cell(line, 8, data[day]['dinheiro']).number_format = "R$ #.##0,0"
                 worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
                 worksheet.cell(line, 9, data[day]['pix'])
-                worksheet.cell(line, 9, data[day]['pix']).number_format = "R$ #.##0,0"
                 worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
 
 class Buttons(Aplication):
