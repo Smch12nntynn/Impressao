@@ -3,7 +3,7 @@ from tkcalendar import DateEntry
 from tkinter import ttk
 from tkinter import messagebox
 import openpyxl
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Font
 import os 
 import random
 
@@ -14,8 +14,9 @@ class Aplication():
     def __init__(self) -> None:
         self.book = openpyxl.Workbook()
         self.template_name = "Template.xlsx"
-        self.file_BD_workbook = "Banco de Dados"
-        self.file_monthly_workbook = "Mensal"
+        self.BD_workbook = "Banco de Dados"
+        self.monthly_workbook = "Mensal"
+        self.analysis_workbook = "Analise"
         self.this_book_name = ""
         self.months = {
         1: "Janeiro",
@@ -38,11 +39,11 @@ class Aplication():
         return workbook
     def open_BD_worksheet(self, workbook):
         aplication_class = Aplication()
-        worksheet = workbook[aplication_class.file_BD_workbook]
+        worksheet = workbook[aplication_class.BD_workbook]
         return worksheet
     def open_monthly_worksheet(self, workbook):
         aplication_class = Aplication()
-        worksheet = workbook[aplication_class.file_monthly_workbook]
+        worksheet = workbook[aplication_class.monthly_workbook]
         return worksheet
     def fill_worksheet(self, worksheet, data, posicion) -> None:
         alignment = Alignment(horizontal="center", vertical="center")
@@ -63,7 +64,7 @@ class Aplication():
         try:
             month = str(aplication_class.months[int(self.entry_data.get().split("/")[0])])
             year = str(self.entry_data.get().split("/")[2])
-            name = month + "20" + year + ".xlsx"
+            name = month + "_20" + year + ".xlsx"
             return name
         except ValueError:
             messagebox.showerror("Erro", "Esqueceu de preencher a DATA.")
@@ -199,28 +200,30 @@ class Aplication():
             dados_dia[dia]["dinheiro"] += dinheiro
             dados_dia[dia]["pix"] += pix
         return dados_dia
-    def insert_monthly_data(self, m_ws, data):
+    def extract_month_year(self, filename):
+        name_without_ext = filename.split(".")[0]
+        month, year = name_without_ext.split("_")
+        month = month.capitalize()
+        return f"{month} {year}"
+    def insert_monthly_data(self, m_ws, data, name):
         worksheet = m_ws
         alignment = Alignment(horizontal="center", vertical="center")
+        font = Font(bold=True, size=16)
+
+        month_year = self.extract_month_year(name)
+        worksheet.cell(1, 4, month_year).font = font
+        worksheet.cell(1, 4, month_year).alignment = alignment
         for i in range(1, 32):
-            line = i + 2
+            line = i + 4
             day = str(worksheet.cell(line, 1).value)
-            if day in data:
-                worksheet.cell(line, 2, data[day]['copias_br'])
-                worksheet.cell(line, 2, data[day]['copias_br']).alignment = alignment
-                worksheet.cell(line, 3, data[day]['copias_ri'])
-                worksheet.cell(line, 3, data[day]['copias_ri']).alignment = alignment
-                worksheet.cell(line, 4, data[day]['perdas_br'])
-                worksheet.cell(line, 4, data[day]['perdas_br']).alignment = alignment
-                worksheet.cell(line, 5, data[day]['perdas_ri'])
-                worksheet.cell(line, 5, data[day]['perdas_ri']).alignment = alignment
-                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br'])
-                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br']).alignment = alignment
-                worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri'])
+            if day in data:                
+                worksheet.cell(line, 2, data[day]['copias_br']).alignment = alignment                
+                worksheet.cell(line, 3, data[day]['copias_ri']).alignment = alignment                
+                worksheet.cell(line, 4, data[day]['perdas_br']).alignment = alignment                
+                worksheet.cell(line, 5, data[day]['perdas_ri']).alignment = alignment                
+                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br']).alignment = alignment                
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
-                worksheet.cell(line, 8, data[day]['dinheiro'])
                 worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
-                worksheet.cell(line, 9, data[day]['pix'])
                 worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
 
 class Buttons(Aplication):
@@ -298,12 +301,12 @@ class Buttons(Aplication):
         except AttributeError:
             return messagebox.showerror("Erro", "Por favor abra uma planilha primeiro")
         quest = messagebox.askyesno("Relatorio", "Deseja realmente fazer o relatorio ?")
-        if quest is True:   
+        if quest is True:
             wb = self.open_workbook(name)
             bd_ws = self.open_BD_worksheet(wb)
             m_ws = self.open_monthly_worksheet(wb)
             dados = self.make_monthly_data(bd_ws)
-            self.insert_monthly_data(m_ws, dados)
+            self.insert_monthly_data(m_ws, dados, name)
             wb.save(name)
 
 class Window(Buttons):
