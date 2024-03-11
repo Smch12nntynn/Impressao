@@ -6,6 +6,7 @@ import openpyxl
 from openpyxl.styles import Alignment, Font
 import os 
 import random
+import pandas as pd
 
 
 root = Tk()
@@ -58,7 +59,7 @@ class Aplication():
         if posicion == 0:
             for_cell(1)
         else:
-            for_cell(posicion + 1)           
+            for_cell(posicion + 1)
     def name_worksheet(self):
         aplication_class = Aplication()
         try:
@@ -158,7 +159,7 @@ class Aplication():
         row_index = self.get_row_index_from_id(id, ws)
         if row_index >= 0:
             for cell in ws[row_index + 1]:
-                cell.value = None 
+                cell.value = None
         for row in ws.iter_rows():
             if not all(cell.value for cell in row):
                 ws.delete_rows(row[0].row, 1)
@@ -216,15 +217,29 @@ class Aplication():
         for i in range(1, 32):
             line = i + 4
             day = str(worksheet.cell(line, 1).value)
-            if day in data:                
-                worksheet.cell(line, 2, data[day]['copias_br']).alignment = alignment                
-                worksheet.cell(line, 3, data[day]['copias_ri']).alignment = alignment                
-                worksheet.cell(line, 4, data[day]['perdas_br']).alignment = alignment                
-                worksheet.cell(line, 5, data[day]['perdas_ri']).alignment = alignment                
-                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br']).alignment = alignment                
+            if day in data:
+                worksheet.cell(line, 2, data[day]['copias_br']).alignment = alignment
+                worksheet.cell(line, 3, data[day]['copias_ri']).alignment = alignment
+                worksheet.cell(line, 4, data[day]['perdas_br']).alignment = alignment
+                worksheet.cell(line, 5, data[day]['perdas_ri']).alignment = alignment
+                worksheet.cell(line, 6, data[day]['copias_br'] + data[day]['perdas_br']).alignment = alignment
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
                 worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
                 worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
+    def pandas_read(self, name):
+        # df = pd.read_excel(name)
+        df = pd.DataFrame(name)
+        # segmento = df.iloc[2:33, 0:8]
+        # print(df)
+    def bubble_sort_dict(self, dados):
+        lista_ordenada = list(dados.items())
+        for i in range(len(lista_ordenada) - 1):
+           for j in range(len(lista_ordenada) - i - 1):
+             if int(lista_ordenada[j][0]) > int(lista_ordenada[j + 1][0]):
+                    lista_ordenada[j], lista_ordenada[j + 1] = lista_ordenada[j + 1], lista_ordenada[j]     
+        return lista_ordenada    
+    def dic_for_pandas(self, dados):
+        pass
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -291,7 +306,7 @@ class Buttons(Aplication):
             self.insert_tree(self.open_BD_worksheet(self.open_workbook(name)))
         else:
             print("primeiro carregue uma planilha")
-    def popupbutton_open_excel(self, popup, listbox): 
+    def popupbutton_open_excel(self, popup, listbox):
         book_name = self.get_selected_option(popup, listbox)
         self.this_book_name = book_name
         self.insert_tree(self.open_BD_worksheet(self.open_workbook(book_name)))
@@ -308,6 +323,10 @@ class Buttons(Aplication):
             dados = self.make_monthly_data(bd_ws)
             self.insert_monthly_data(m_ws, dados, name)
             wb.save(name)
+            formatado = self.bubble_sort_dict(dados)
+            self.pandas_read(formatado)
+            # print(formatado)
+
 
 class Window(Buttons):
     def __init__(self):
@@ -338,7 +357,7 @@ class Window(Buttons):
         self.lf_pagamentos = LabelFrame(self.lf_dados, text="Pagamentos", borderwidth=1, relief="solid")
         self.lf_pagamentos.place(x=300, y=40, width=185, height=120)
         self.lf_pagamentos = LabelFrame(self.lf_dados, text="Impressão", borderwidth=1, relief="solid")
-        self.lf_pagamentos.place(x=15, y=40, width=250, height=120)     
+        self.lf_pagamentos.place(x=15, y=40, width=250, height=120)
     def buttons(self):
 
         self.bt_buscar = Button(self.frame_1, text="Buscar", command=self.button_find)
@@ -372,11 +391,11 @@ class Window(Buttons):
         self.label_copias = Label(self.frame_1, text="Cópias")
         self.label_copias.place(relx=0.05, rely=0.58, relheight=0.05, relwidth=0.05)
         self.label_perdas = Label(self.frame_1, text="Perdas")
-        self.label_perdas.place(relx=0.05, rely=0.68, relheight=0.05, relwidth=0.05) 
+        self.label_perdas.place(relx=0.05, rely=0.68, relheight=0.05, relwidth=0.05)
         self.label_copias_br = Label(self.frame_1, text="Brother")
         self.label_copias_br.place(relx=0.12, rely=0.5, relheight=0.05, relwidth=0.05)
         self.label_copias_r = Label(self.frame_1, text="Ricoh")
-        self.label_copias_r.place(relx=0.215, rely=0.5, relheight=0.05, relwidth=0.05) 
+        self.label_copias_r.place(relx=0.215, rely=0.5, relheight=0.05, relwidth=0.05)
         self.entry_copias_br = Entry(self.frame_1)
         self.entry_copias_br.place(relx=0.12, rely=0.56, relheight=0.1, relwidth=0.08)
         self.entry_copias_r = Entry(self.frame_1)
@@ -397,7 +416,7 @@ class Window(Buttons):
     def output_list(self):
         self.list_print = ttk.Treeview(self.frame_2, height=5, columns=("col1","col2","col3","col4","col5","col6","col7","col8","col9"))
         self.list_print.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
-        
+
         self.list_scroll = Scrollbar(self.frame_2, orient="vertical")
         self.list_print.configure(yscroll=self.list_scroll.set)
         self.list_scroll.place(relx=0.96,rely=0.1,relheight=0.85,relwidth=0.035)
@@ -456,7 +475,7 @@ class Window(Buttons):
             listbox.insert(END, file)
         listbox.selection_set(0)
         button = Button(popup, text="OK", command=lambda: self.popupbutton_open_excel(popup, listbox))
-        button.pack()  
+        button.pack()
         popup.wait_window()
 
 def main():
