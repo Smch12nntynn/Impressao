@@ -226,9 +226,9 @@ class Aplication():
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
                 worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
                 worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
-    def pandas_read(self, name):
+    # def pandas_read(self, data, index):
         # df = pd.read_excel(name)
-        df = pd.DataFrame(name)
+        # df = pd.DataFrame(name)
         # segmento = df.iloc[2:33, 0:8]
         # print(df)
     def bubble_sort_dict(self, dados):
@@ -238,8 +238,33 @@ class Aplication():
              if int(lista_ordenada[j][0]) > int(lista_ordenada[j + 1][0]):
                     lista_ordenada[j], lista_ordenada[j + 1] = lista_ordenada[j + 1], lista_ordenada[j]     
         return lista_ordenada    
-    def dic_for_pandas(self, dados):
-        pass
+    def dic_for_pandas(self, data):
+        colunas = {
+            "dia": [],
+            "copias_br": [],
+            "copias_ri": [],
+            "perdas_br": [],
+            "perdas_ri": [],
+            "dinheiro": [],
+            "pix": [],
+            }
+        for i in range(0,32):
+            try:
+                day = data[i][0]
+                colunas["dia"].append(day)
+                colunas["copias_br"].append(data[i][1]["copias_br"])
+                colunas["copias_ri"].append(data[i][1]["copias_ri"])
+                colunas["perdas_br"].append(data[i][1]["perdas_br"])
+                colunas["perdas_ri"].append(data[i][1]["perdas_ri"])
+                colunas["dinheiro"].append(data[i][1]["dinheiro"])
+                colunas["pix"].append(data[i][1]["pix"])
+                # print(day)
+                # print(data[i][1]["copias_br"])
+                print(colunas)
+            except IndexError:
+                pass
+        print(colunas)
+
 
 class Buttons(Aplication):
     def __init__(self) -> None:
@@ -324,7 +349,7 @@ class Buttons(Aplication):
             self.insert_monthly_data(m_ws, dados, name)
             wb.save(name)
             formatado = self.bubble_sort_dict(dados)
-            self.pandas_read(formatado)
+            self.dic_for_pandas(formatado)
             # print(formatado)
 
 
