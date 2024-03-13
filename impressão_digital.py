@@ -226,11 +226,11 @@ class Aplication():
                 worksheet.cell(line, 7, data[day]['copias_br'] + data[day]['perdas_ri']).alignment = alignment
                 worksheet.cell(line, 8, data[day]['dinheiro']).alignment = alignment
                 worksheet.cell(line, 9, data[day]['pix']).alignment = alignment
-    # def pandas_read(self, data, index):
+    def pandas_read(self, data):
         # df = pd.read_excel(name)
-        # df = pd.DataFrame(name)
+        df = pd.DataFrame(data)
         # segmento = df.iloc[2:33, 0:8]
-        # print(df)
+        print(df)
     def bubble_sort_dict(self, dados):
         lista_ordenada = list(dados.items())
         for i in range(len(lista_ordenada) - 1):
@@ -263,7 +263,7 @@ class Aplication():
                 print(colunas)
             except IndexError:
                 pass
-        print(colunas)
+        return colunas
 
 
 class Buttons(Aplication):
@@ -349,7 +349,7 @@ class Buttons(Aplication):
             self.insert_monthly_data(m_ws, dados, name)
             wb.save(name)
             formatado = self.bubble_sort_dict(dados)
-            self.dic_for_pandas(formatado)
+            self.pandas_read(self.dic_for_pandas(formatado))
             # print(formatado)
 
 
