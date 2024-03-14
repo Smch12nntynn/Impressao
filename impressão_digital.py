@@ -348,8 +348,8 @@ class Buttons(Aplication):
             dados = self.make_monthly_data(bd_ws)
             self.insert_monthly_data(m_ws, dados, name)
             wb.save(name)
-            formatado = self.bubble_sort_dict(dados)
-            self.pandas_read(self.dic_for_pandas(formatado))
+            # formatado = self.bubble_sort_dict(dados)
+            # self.pandas_read(self.dic_for_pandas(formatado))
             # print(formatado)
 
 
